@@ -21,14 +21,32 @@ namespace intelligence.DEL
         {
             string sql = $"INSERT INTO People (FullName, SecretCode, AmountReports,NumMention, Potential)VALUES (' {Newpeople.GetFullName()}', '{Newpeople.GetSecretCode()}',{Newpeople.GetAmountReports()},'{Newpeople.GetNumMention()}' ,'{Newpeople.GetPotential()}');";
             DBconnection.DBconnection.Execute(sql);
-            
-            
+            Utils.Loger.Logger.Log($"{Newpeople.GetFullName()} נוסף בהצלחה");
+        }
+        public static int InsertRandomPerson()
+        {
+            Random rnd = new Random();
+
+            string[] firstNames = { "David", "Sarah", "Daniel", "Lea", "Avi", "Noa", "Itay", "Yael" };
+            string[] lastNames = { "Cohen", "Levi", "Mizrahi", "Peretz", "Katz", "Ben David" };
+            string fullName = $"{firstNames[rnd.Next(firstNames.Length)]} {lastNames[rnd.Next(lastNames.Length)]}";
+
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            string secretCode = new string(Enumerable.Repeat(chars, 8)
+                .Select(s => s[rnd.Next(s.Length)]).ToArray());
+            People newPerson = new People(fullName, secretCode);
+            InsertNewPeople(newPerson);
+            string getIdSql = "SELECT LAST_INSERT_ID() AS NewId;";
+            var result = DBconnection.DBconnection.Execute(getIdSql);
+            int newId = Convert.ToInt32(result[0]["NewId"]);
+            return newId;
         }
         public static object GetAllPeople()
         {
             string sql = $"SELECT * FROM People";
             var resolt = DBconnection.DBconnection.Execute(sql);
             DBconnection.DBconnection.PrintResult(resolt);
+            Utils.Loger.Logger.Log("בקשה של כל האנשים");
             return resolt;
         }
         public static List<Dictionary<string, object>> GetPeopleByID(int id)
@@ -36,12 +54,29 @@ namespace intelligence.DEL
             string sql = $"SELECT * FROM People WHERE Id = {id}";
             var resolt = DBconnection.DBconnection.Execute(sql);
             DBconnection.DBconnection.PrintResult(resolt);
+            Utils.Loger.Logger.Log("בקשה שם לפי ID");
             return resolt;
+        }
+        public static bool IsExsistreporter(int reporterid)
+        {
+            string sql = $"SELECT EXISTS(SELECT 1 FROM People WHERE ID = {reporterid}) AS ExistsFlag";
+            var result = DBconnection.DBconnection.Execute(sql);
+            bool exists = Convert.ToBoolean(result[0]["ExistsFlag"]);
+            return exists;
+        }
+        public static bool IsExsisttarget(int targetid)
+        {
+            string sql = $"SELECT EXISTS(SELECT 1 FROM People WHERE ID = {targetid}) AS ExistsFlag";
+            var result = DBconnection.DBconnection.Execute(sql);
+            bool exists = Convert.ToBoolean(result[0]["ExistsFlag"]);
+            return exists;
         }
         public static object UpdateAmountReports(int id)
         {
             string sql = $"UPDATE People SET AmountReports = AmountReports + 1 WHERE Id = {id}";
             DBconnection.DBconnection.Execute(sql);
+            Utils.Loger.Logger.Log("עודכן כמות דיווחים");
+
             string sql1 = $"SELECT AmountReports FROM People WHERE Id = {id}";
             List<Dictionary<string, object>> AmountReports = DBconnection.DBconnection.Execute(sql1);
             int amount = Convert.ToInt32(AmountReports[0]["AmountReports"]);
@@ -58,7 +93,9 @@ namespace intelligence.DEL
         {
             string sql = $"UPDATE People SET NumMention = NumMention + 1 WHERE Id = {id}";
             DBconnection.DBconnection.Execute(sql);
-            
+            Utils.Loger.Logger.Log("עודכן כמות דיווחים");
+
+
 
         }
         public static void UpdatePotential(int id)
@@ -66,7 +103,41 @@ namespace intelligence.DEL
             string sql = $"UPDATE People SET Potential = NOT Potential WHERE Id = {id}";
             DBconnection.DBconnection.Execute(sql);
             List<Dictionary<string, object>>  resolt = GetPeopleByID(id);
-            
+            Utils.Loger.Logger.Log("הלקוח נהייה בפוטנציאל");
+
+
+        }
+        public static int CountAlerts(int id)
+        {
+            string sql = $"SELECT COUNT(*) AS AlertCount FROM Alerts WHERE TargetID = {id}";
+            var result = DBconnection.DBconnection.Execute(sql);
+            int count = Convert.ToInt32(result[0]["AlertCount"]);
+            return count;
+
+        }
+        public static bool Is3Mussegin15Minutes(int id)
+        {
+            string sql = $"SELECT COUNT(*) AS RecentAlertCount FROM Reports WHERE TargetID = {id} AND CreatedAt >= NOW() - INTERVAL 15 MINUTE";
+            var result = DBconnection.DBconnection.Execute(sql);
+            int recentCount = Convert.ToInt32(result[0]["RecentAlertCount"]);
+
+            if (recentCount == 3)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool IsSuspect(int id)
+        {
+            int totalAlerts = CountAlerts(id);
+            bool hasRecentAlerts = Is3Mussegin15Minutes(id);
+
+            if (totalAlerts == 20 || hasRecentAlerts)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

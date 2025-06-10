@@ -22,7 +22,15 @@ namespace intelligence.DEL
             DBconnection.DBconnection.Execute(sql);
             DelPeople.UpdateAmountReports(NewReport.GetReporterID());
             DelPeople.UpdateNumMention(NewReport.GetTargetID());
+            int result = NewReport.GetTargetID();
+           
+            if (DelPeople.IsSuspect(result))
+            {
+                DelAlert.InsertAlert(result);
+            }
+            Utils.Loger.Logger.Log("נוסף דיווח חדש");
+
         }
-            
+
     }
 }
