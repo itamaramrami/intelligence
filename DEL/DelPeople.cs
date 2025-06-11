@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,62 @@ namespace intelligence.DEL
             DBconnection.DBconnection.Execute(sql);
             Utils.Loger.Logger.Log($"{Newpeople.GetFullName()} נוסף בהצלחה");
         }
-        public static int InsertRandomPerson()
+
+        public static int CheckedInput(string input)
+        {
+            bool isNumber = int.TryParse(input, out int number);
+            while (!isNumber)
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+                input = Console.ReadLine();
+                isNumber = int.TryParse(input, out number);
+            }
+            return number;
+        }
+        public static int IsGoodNumber(int num)
+        {
+            
+            while (num < 1 || num > 5)
+            {
+                Console.WriteLine("Enter a number between 1 and 5:");
+                string input = Console.ReadLine();
+                 num = CheckedInput(input);
+            }
+            return num;
+        }
+        public static int GetOrCreatPerson(int id)
+        {
+            int res = GetPepoleById(id);
+            if (res==-1)
+            {
+                int ress = InsertRandomPerson();
+                return ress;
+
+            }
+            return res;
+            
+           
+
+        }
+        public static int GetPepoleById(int id)
+        {
+            string sql = $"SELECT Id FROM People WHERE Id = {id}";
+            var result = DBconnection.DBconnection.Execute(sql);
+            if (result.Count == 0) return -1;
+
+            int idd= Convert.ToInt32(result[0]["Id"]);
+            return idd;
+        }
+
+
+
+
+
+
+
+
+
+        public static int InsertRandomPerson(string name ="")
         {
             Random rnd = new Random();
 
@@ -57,6 +113,22 @@ namespace intelligence.DEL
             Utils.Loger.Logger.Log("בקשה שם לפי ID");
             return resolt;
         }
+        public static string GetSecretCodeByName(string fullName)
+        {
+            string sql = $"SELECT SecretCode FROM People WHERE FullName = '{fullName}'";
+            var result = DBconnection.DBconnection.Execute(sql);
+
+            if (result.Count == 0)
+            {
+                Utils.Loger.Logger.Log($"לא נמצא אדם בשם: {fullName}");
+                return null; 
+            }
+
+            string secretCode = result[0]["SecretCode"].ToString();
+            Utils.Loger.Logger.Log($"התקבל SecretCode של {fullName}");
+            return secretCode;
+        }
+
         public static bool IsExsistreporter(int reporterid)
         {
             string sql = $"SELECT EXISTS(SELECT 1 FROM People WHERE ID = {reporterid}) AS ExistsFlag";

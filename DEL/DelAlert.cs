@@ -35,5 +35,21 @@ namespace intelligence.DEL
 
         }
 
+        public static void PrintAllAlerts()
+        {
+            string sql = "SELECT * FROM Alerts";
+            var result = DBconnection.DBconnection.Execute(sql);
+
+            if (result.Count == 0)
+            {
+                Console.WriteLine("לא נמצאו דיווחים בטבלת Alerts.");
+                return;
+            }
+
+            DBconnection.DBconnection.PrintResult(result);
+            Utils.Loger.Logger.Log("בוצעה שליפת כל הדיווחים מהטבלה Alerts.");
+        }
+
+
     }
 }

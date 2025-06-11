@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZstdSharp.Unsafe;
 
 namespace intelligence
 {
@@ -12,7 +13,6 @@ namespace intelligence
     {
         static void Main(string[] args)
         {
-            int choice;
             Console.WriteLine("hello");
             //DelAlert.CreatTableAlert();
             //DelPeople.CreatTablePeople();
@@ -34,12 +34,11 @@ namespace intelligence
             //DelPeople.UpdateAmountReports(1);
             menu();
             Console.WriteLine("enter your choice:");
-            choice = int.Parse(Console.ReadLine());
-            while (choice < 1 || choice > 5)
-            {
-                Console.WriteLine("Invalid choice. Please enter a number between 1 and 5.");
-                choice = int.Parse(Console.ReadLine());
-            }
+            string choic = Console.ReadLine();
+            int choice = DelPeople.CheckedInput(choic);
+            choice = DelPeople.IsGoodNumber(choice);
+
+
             do
             {
 
@@ -47,96 +46,66 @@ namespace intelligence
                 switch (choice)
                 {
                     case 1:
-                        Console.WriteLine("insert reporter id");
-                        string input = Console.ReadLine();
-                        bool isNumber = int.TryParse(input, out int reporteid);
-                        while (!isNumber)
-                        {
-                            Console.WriteLine("Invalid input. Please enter a valid number:");
-                            input = Console.ReadLine();
-                            isNumber = int.TryParse(input, out reporteid);
-                        }
-                        if (DelPeople.IsExsistreporter(reporteid))
-                        {
-                            Console.WriteLine("insert target id:");
-                            input = Console.ReadLine();
-                            isNumber = int.TryParse(input, out int targetid);
-                            while (!isNumber)
-                            {
-                                Console.WriteLine("Invalid input. Please enter a valid number:");
-                                input = Console.ReadLine();
-                                isNumber = int.TryParse(input, out targetid);
-                            }
-                            if (DelPeople.IsExsisttarget(targetid))
-                            {
-                                Console.WriteLine("enter a report:");
-                                string rep = Console.ReadLine();
-                                Reports newreport = new Reports(reporteid, targetid, rep);
-                                DelReports.InsertNewReport(newreport);
-                            }
-                            else
-                            {
-                                int newid = DelPeople.InsertRandomPerson();
-                                Console.WriteLine("enter a report:");
-                                string rep = Console.ReadLine();
-                                Reports newreport = new Reports(reporteid, newid, rep);
-                                DelReports.InsertNewReport(newreport);
+                        Console.WriteLine("enter a reporter id:");
+                        string res = Console.ReadLine();
+                        int Newreort = DelPeople.CheckedInput(res);
+                        int nwereportt = DelPeople.GetOrCreatPerson(Newreort);
 
-                            }
-                        }
-                        else
-                        {
-                            int newidd = DelPeople.InsertRandomPerson();
-                            Console.WriteLine("insert target id:");
-                            input = Console.ReadLine();
-                            isNumber = int.TryParse(input, out int targetid);
-                            while (!isNumber)
-                            {
-                                Console.WriteLine("Invalid input. Please enter a valid number:");
-                                input = Console.ReadLine();
-                                isNumber = int.TryParse(input, out targetid);
-                            }
-                            if (DelPeople.IsExsisttarget(targetid))
-                            {
-                                Console.WriteLine("enter a report:");
-                                string rep = Console.ReadLine();
-                                Reports newreport = new Reports(newidd, targetid, rep);
-                                DelReports.InsertNewReport(newreport);
-                            }
-                            else
-                            {
-                                int newid = DelPeople.InsertRandomPerson();
-                                Console.WriteLine("enter a report:");
-                                string rep = Console.ReadLine();
-                                Reports newreport = new Reports(newidd, newid, rep);
-                                DelReports.InsertNewReport(newreport);
-                            }
-                        }
+
+                        Console.WriteLine("enter a target id:");
+                        string ress = Console.ReadLine();
+                        int Newtarget = DelPeople.CheckedInput(ress);
+                        int newtargett = DelPeople.GetOrCreatPerson(Newtarget);
+
+                        Console.WriteLine("enter a report:");
+                        string rep = Console.ReadLine();
+                        Reports nwerep = new Reports(nwereportt, newtargett, rep);
+                        DelReports.InsertNewReport(nwerep);
+
+
+
+
+
+
+
+
                         Console.WriteLine("enter your choice:");
                         menu();
+                        Console.WriteLine("enter your choice:");
+                        choic = Console.ReadLine();
+                        choice = DelPeople.CheckedInput(choic);
+                        choice = DelPeople.IsGoodNumber(choice);
                         break;
                     case 2:
-                        
-                        Console.WriteLine("Enter your choice:");
+                        Console.WriteLine("enter your name:");
+                        string name = Console.ReadLine();
+                        DelPeople.GetSecretCodeByName(name);
                         menu();
 
                         break;
                     case 3:
-                        
+                        Utils.CSV.ImportCSV.ImportCsv();
                         menu();
-                        
+                        Console.WriteLine("enter your choice:");
+                        choic = Console.ReadLine();
+                        choice = DelPeople.CheckedInput(choic);
+                        choice = DelPeople.IsGoodNumber(choice);
                         break;
                     case 4:
-                       
+                        DelAlert.PrintAllAlerts();
                         menu();
-                        
+                        Console.WriteLine("enter your choice:");
+                        choic = Console.ReadLine();
+                        choice = DelPeople.CheckedInput(choic);
+                        choice = DelPeople.IsGoodNumber(choice);
+
                         break;
                     case 5:
-                        
-                        menu();
-                        
+
+                        Console.WriteLine("You went out successfully");
+
                         break;
-                    
+
 
                     default:
                         Console.WriteLine("Invalid choice. Please try again.");
@@ -145,19 +114,18 @@ namespace intelligence
 
                 }
             } while (choice != 5);
+         }
 
 
 
-
-        }
+        
         static void menu()
         {
             Console.WriteLine("Submit report enter 1");
-            Console.WriteLine("import from csv enter 2");
-            Console.WriteLine("show secret name by name enter 3");
+            Console.WriteLine("show secret name by name enter 2");
+            Console.WriteLine("import from csv enter 3");
             Console.WriteLine("Analysis Deshboard enter 4");
             Console.WriteLine("exit enter 5");
-           
         }
     }
 }
