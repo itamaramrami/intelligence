@@ -12,56 +12,66 @@ namespace intelligence.Utils.CSV
     {
         public static void ImportCsv()
         {
-            //        Console.Write("CSV file path: ");
-            //        var path = Console.ReadLine();
-            //        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-            //        {
-            //            Console.WriteLine("File not found.\n");
-            //            return;
-            //        }
+            int count = 0;
 
-            //        int count = 0;
-            //        using var reader = new StreamReader(path);
-            //        string  header = reader.ReadLine();
-            //        if (header == null)
-            //        {
-            //            Console.WriteLine("CSV is empty.\n");
-            //            return;
-            //        }
+            try
+            {
+                var reader = new StreamReader("C:\\Users\\IMOE001\\Desktop\\c#\\intelligence\\sample_import.csv");
 
-            //        while (!reader.EndOfStream)
-            //        {
-            //            var line = reader.ReadLine();
-            //            if (string.IsNullOrWhiteSpace(line)) continue;
-            //            var parts = line.Split(',');
-            //            if (parts.Length < 3) continue;
+                string header = reader.ReadLine();
+                if (header == null)
+                {
+                    Console.WriteLine("CSV is empty.\n");
+                    return;
+                }
 
-            //            var reporterName = parts[0].Trim();
-            //            var targetName = parts[1].Trim();
-            //            var text = parts[2].Trim();
-            //            DateTime? ts = null;
-            //            if (parts.Length >= 4)
-            //            {
-            //                DateTime parsedDate;
-            //                if (DateTime.TryParse(parts[3].Trim(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out parsedDate))
-            //                    ts = parsedDate;
-            //            }
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    Console.WriteLine($"line{line}");
 
-            //            if (string.IsNullOrWhiteSpace(reporterName) || string.IsNullOrWhiteSpace(targetName) || string.IsNullOrWhiteSpace(text))
-            //                continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
-            //            int reporterId = Utils.Helpers.GetOrCreatePerson(reporterName);
-            //            int targetId = Utils.Helpers.GetOrCreatePerson(targetName);
+                    var parts = line.Split(',');
 
-            //            Reports newReport = new Reports(reporterId, targetId, text);
-            //            DelReports.InsertNewReport(newReport);
+                    if (parts.Length < 4) continue;
 
-            //            count++;
-            //        }
+                    string reporter = parts[0];
+                    string target = parts[1];
+                    string text = parts[2];
+                    string timePart = parts[3];
+                    
+                    
 
-            //        Logger.Log($"CSVImport: Imported {count} reports from {path}");
-            //        Console.WriteLine($"Imported {count} reports.\n");
-            //    }
+                    if (!DateTime.TryParse(timePart, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var ts)) continue;
+                    if (string.IsNullOrWhiteSpace(reporter) || string.IsNullOrWhiteSpace(target) || string.IsNullOrWhiteSpace(text)) continue;
+
+                    int reporterId = DelPeople.InsertRandomPerson(reporter);
+                    int targetId = DelPeople.InsertRandomPerson(target);
+                    if (reporterId == null || targetId == null) continue;
+
+                    Reports rep = new Reports(reporterId, targetId, text);
+                    DelReports.InsertNewReport(rep);
+                    count++;
+                }
+
+                Logger.Log($"CSVImport: Imported {count} reports from sample_import.csv");
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("⚠️ File not found. Make sure the path is correct.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"⚠️ Error occurred: {ex.Message}");
+            }
         }
+
+
+
+
+
+
     }
+
 }

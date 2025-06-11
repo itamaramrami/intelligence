@@ -110,6 +110,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="sample_import.csv" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="log.txt" />
