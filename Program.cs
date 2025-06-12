@@ -92,7 +92,10 @@ namespace intelligence
                         choice = DelPeople.IsGoodNumber(choice);
                         break;
                     case 4:
+                        Console.WriteLine("Alerts");
                         DelAlert.PrintAllAlerts();
+                        
+
                         menu();
                         Console.WriteLine("enter your choice:");
                         choic = Console.ReadLine();
@@ -101,6 +104,44 @@ namespace intelligence
 
                         break;
                     case 5:
+                        
+                        Console.WriteLine("Potentially");
+                        DelPeople.GetAllPotentially();
+
+                        menu();
+                        Console.WriteLine("enter your choice:");
+                        choic = Console.ReadLine();
+                        choice = DelPeople.CheckedInput(choic);
+                        choice = DelPeople.IsGoodNumber(choice);
+
+                        break;
+                    case 6:
+
+                        Console.WriteLine("all people:");
+                        DelPeople.GetAllPeople();
+                        menu();
+                        Console.WriteLine("enter your choice:");
+                        choic = Console.ReadLine();
+                        choice = DelPeople.CheckedInput(choic);
+                        choice = DelPeople.IsGoodNumber(choice);
+
+                        break;
+                    case 7:
+
+                        Console.WriteLine("enter your name:");
+                        string name1 = Console.ReadLine(); 
+                        Console.WriteLine("enter secret code:");
+                        string scode = Console.ReadLine();
+                        People pers = new People(name1, scode);
+                        DelPeople.InsertNewPeople(pers);
+                        menu();
+                        Console.WriteLine("enter your choice:");
+                        choic = Console.ReadLine();
+                        choice = DelPeople.CheckedInput(choic);
+                        choice = DelPeople.IsGoodNumber(choice);
+
+                        break;
+                    case 8:
 
                         Console.WriteLine("You went out successfully");
 
@@ -113,19 +154,29 @@ namespace intelligence
 
 
                 }
-            } while (choice != 5);
+            } while (choice != 8);
          }
 
 
 
-        
+
         static void menu()
         {
-            Console.WriteLine("Submit report enter 1");
-            Console.WriteLine("show secret name by name enter 2");
-            Console.WriteLine("import from csv enter 3");
-            Console.WriteLine("Analysis Deshboard enter 4");
-            Console.WriteLine("exit enter 5");
+
+            Console.WriteLine("=======================================");
+            Console.WriteLine("               MAIN MENU               ");
+            Console.WriteLine("=======================================");
+            Console.WriteLine(" 1. Submit Report");
+            Console.WriteLine(" 2. Show Secret Name by Name");
+            Console.WriteLine(" 3. Import from CSV");
+            Console.WriteLine(" 4. Get all alert");
+            Console.WriteLine(" 5. Get all Potentially");
+            Console.WriteLine(" 6. get all people");
+            Console.WriteLine(" 7. Entering a user");
+            Console.WriteLine(" 8. Exit");
+            Console.WriteLine("=======================================");
+            Console.Write("Please enter your choice (1-8): ");
         }
+
     }
 }
