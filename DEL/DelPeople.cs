@@ -1,7 +1,9 @@
 ﻿using intelligence.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,9 +41,9 @@ namespace intelligence.DEL
         public static int IsGoodNumber(int num)
         {
             
-            while (num < 1 || num > 5)
+            while (num < 1 || num > 8)
             {
-                Console.WriteLine("Enter a number between 1 and 5:");
+                Console.WriteLine("Enter a number between 1 and 8:");
                 string input = Console.ReadLine();
                  num = CheckedInput(input);
             }
@@ -105,6 +107,20 @@ namespace intelligence.DEL
             Utils.Loger.Logger.Log("בקשה של כל האנשים");
             return resolt;
         }
+        public static object GetAllPotentially()
+        {
+            string sql = $"SELECT * FROM People WHERE Potential = true";
+            var resolt = DBconnection.DBconnection.Execute(sql);
+            DBconnection.DBconnection.PrintResult(resolt);
+            Utils.Loger.Logger.Log("בקשה של כל הפוטנציאלים");
+            return resolt;
+        }
+       
+
+
+
+
+
         public static List<Dictionary<string, object>> GetPeopleByID(int id)
         {
             string sql = $"SELECT * FROM People WHERE Id = {id}";
@@ -115,8 +131,11 @@ namespace intelligence.DEL
         }
         public static string GetSecretCodeByName(string fullName)
         {
-            string sql = $"SELECT SecretCode FROM People WHERE FullName = '{fullName}'";
+            string trimmedName = fullName.Trim();
+            string sql = $"SELECT SecretCode FROM People WHERE LOWER(TRIM(FullName)) = LOWER('{trimmedName}')LIMIT 1";
+
             var result = DBconnection.DBconnection.Execute(sql);
+            
 
             if (result.Count == 0)
             {
@@ -126,6 +145,7 @@ namespace intelligence.DEL
 
             string secretCode = result[0]["SecretCode"].ToString();
             Utils.Loger.Logger.Log($"התקבל SecretCode של {fullName}");
+            DBconnection.DBconnection.PrintResult(result);
             return secretCode;
         }
 
